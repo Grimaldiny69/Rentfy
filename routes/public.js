@@ -6,6 +6,8 @@ const logInController = require("../Controllers/logInController");
 const propertyController = require("../Controllers/propertyController");
 const locationControler = require("../Controllers/locationController");
 const imageController = require("../Controllers/imageController");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 /* Log-in */
 
 router.get("/", async (req, res) => {
@@ -14,9 +16,12 @@ router.get("/", async (req, res) => {
   try {
     const logIn = await logInController.findUser(email, password);
 
-    res.status(201).json(logIn ? logIn : "Email ou Password Incorrta!");
+    res.status(201).json(logIn ? logIn : "Usuário Não Encontrado!");
   } catch (error) {
-    res.status(500).json(error.message);
+    res.status(500).json({
+      status: 500,
+      message: error.message,
+    });
   }
 });
 
