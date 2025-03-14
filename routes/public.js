@@ -8,15 +8,22 @@ const locationControler = require("../Controllers/locationController");
 const imageController = require("../Controllers/imageController");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+require("dotenv").config();
+const secretKey = process.env.JWT_SECRET;
 /* Log-in */
 
 router.get("/", async (req, res) => {
-  const { email, password } = req.body;
-
   try {
-    const logIn = await logInController.findUser(email, password);
+    const { email, password } = req.body;
+    const userData = await logInController.findUser(email);
+    const PassValidation = await bcrypt.compare(password, userData.password);
 
-    res.status(201).json(logIn ? logIn : "Usuário Não Encontrado!");
+    if (PassValidation) {
+      const token = await jwt.sign(userData.id, secretKey, { expiredIn: "1h" });
+      res.status(201).json(token);
+    }
+
+    res.status(201).json("Usuário Não Encontrado!");
   } catch (error) {
     res.status(500).json({
       status: 500,

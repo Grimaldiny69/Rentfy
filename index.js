@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
-const port = 3030;
+require("dotenv").config();
+const PORT = process.env.PORT;
 
 const publicRoutes = require("./routes/public.js");
 
@@ -8,6 +9,7 @@ app.use(express.json());
 app.use("/cadastro", publicRoutes);
 app.use("/cadastro/propriedades", publicRoutes);
 app.use("/", publicRoutes);
-app.listen(port, () => {
-  console.log(`Servidor rodando na porta ${port}.....`);
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}.....`);
+  console.log(process.env.PORT);
 });
