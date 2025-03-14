@@ -19,11 +19,14 @@ router.get("/", async (req, res) => {
     const PassValidation = await bcrypt.compare(password, userData.password);
 
     if (PassValidation) {
-      const token = await jwt.sign(userData.id, secretKey, { expiredIn: "1h" });
+      console.log(secretKey);
+      const token = await jwt.sign({ id: userData.id }, secretKey, {
+        expiresIn: "1h",
+      });
       res.status(201).json(token);
+    } else {
+      res.status(204).json("Usuário Não Encontrado!");
     }
-
-    res.status(201).json("Usuário Não Encontrado!");
   } catch (error) {
     res.status(500).json({
       status: 500,
@@ -34,32 +37,38 @@ router.get("/", async (req, res) => {
 
 /* Cadastro */
 router.post("/cadastro", async (req, res) => {
-  const { name, surname, email, password, phoneNumber, idNumber, userType } =
-    req.body;
-  let usertype;
-  if (userType === "Client") {
-    usertype = UserType.Client;
-  } else if (userType === "Admin") {
-    usertype = UserType.Admin;
-  } else if ((usertype = UserType.Owner)) {
-    usertype = UserType.Admin;
-  }
-
   try {
-    const createUser = await userController.create({
-      name,
-      surname,
-      email,
-      password,
-      phoneNumber,
-      idNumber,
-      userType: UserType.Admin,
-    });
-    console.log(createUser);
+    const { name, surname, email, password, phoneNumber, idNumber, userType } =
+      req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const dataValidate = await logInController.findUser(email);
 
-    res.status(201).json(createUser);
+    if (!dataValidate) {
+      const createUser = await userController.create({
+        name,
+        surname,
+        email,
+        password: hashedPassword,
+        phoneNumber,
+        idNumber,
+        userType: UserType[userType],
+      });
+
+      res
+        .status(201)
+        .json(
+          createUser
+            ? "Usuario Cadastrado com sucesso"
+            : "Usuario nao cadatrado"
+        );
+    } else {
+      res.status(201).json("Ja Existe um usuaria com essas credencias");
+    }
   } catch (error) {
-    res.status(500).json(error.message);
+    res.status(500).json({
+      status: 500,
+      message: error.message,
+    });
     console.log(error.message);
   }
 });
