@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String     @id @default(uuid())
+  name        String     @db.VarChar(100)
+  surname     String     @db.VarChar(100)
+  email       String     @unique @db.VarChar(50)
+  password    String
+  phoneNumber String     @db.VarChar(14)
+  idNumber    String     @db.VarChar(16)
+  userType    UserType
+  properties  Property[] // Um usuário pode ter várias propriedades
+  rents       Rent[] // Um usuário pode alugar várias vezes
+  comments    Comments[]
+}
+
+enum UserType {
+  Client
+  Owner
+  Admin
+}
+
+model Location {
+  id         String    @id @default(uuid())
+  provincia  String    @db.VarChar(50)
+  municipio  String    @db.VarChar(50)
+  distrito   String    @db.VarChar(100)
+  bairro     String    @db.VarChar(100)
+  rua        String    @db.VarChar(100)
+  property   Property? @relation(fields: [propertyId], references: [id])
+  propertyId String?   @unique
+}
+
+model Property {
+  id          String     @id @default(uuid())
+  description String
+  price       Decimal // Alterado de String para Decimal
+  rooms       Int
+  wcs         Int
+  livingRooms Int
+  kitchens    Int
+  yards       Int
+  owner       User       @relation(fields: [ownerId], references: [id])
+  ownerId     String
+  location    Location?
+  rents       Rent[]
+  comments    Comments[]
+  images      Images[]
+}
+
+model Rent {
+  id         String   @id @default(uuid())
+  dateStart  DateTime
+  dateEnd    DateTime
+  client     User     @relation(fields: [clientId], references: [id])
+  clientId   String
+  property   Property @relation(fields: [propertyId], references: [id])
+  propertyId String
+}
+
+model Comments {
+  id         String   @id @default(uuid())
+  comment    String   @db.VarChar(250)
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  property   Property @relation(fields: [propertyId], references: [id])
+  propertyId String
+}
+
+model Images {
+  id         String   @id @default(uuid())
+  url        String
+  property   Property @relation(fields: [propertyId], references: [id])
+  propertyId String
+}
