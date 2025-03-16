@@ -34,7 +34,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-/* Cadastro */
+/* Cadastro de usuario */
+
 router.post("/cadastro", async (req, res) => {
   try {
     const { name, surname, email, password, phoneNumber, idNumber, userType } =
@@ -72,31 +73,40 @@ router.post("/cadastro", async (req, res) => {
   }
 });
 
+/* Cadastro de usuario */
+
 router.post("/cadastro/propriedades", async (req, res) => {
   try {
     const { locationData, imageData, propertyData } = req.body;
+
     const createHome = await propertyController.createProperty({
       ...propertyData,
     });
+    global.createHome = createHome;
 
-    if (createHome) {
-      const createLocation = await locationControler.createLocation({
-        ...locationData,
-        propertyId: createHome.id,
-      });
+    const createLocation = await locationControler.createLocation({
+      ...locationData,
+      propertyId: createHome.id,
+    });
+    global.createLocation = createLocation;
 
-      if (createLocation) {
-        const createImage = await imageController.createImages({
-          ...imageData,
-          propertyId: createHome.id,
-        });
-        res.status(201).send({ createHome, createLocation, createImage });
-      } else {
-        await propertyController.deleteProperty({});
-      }
-    }
+    const createImage = await imageController.createImages({
+      ...imageData,
+      propertyId: createHome.id,
+    });
+
+    res.status(201).send({ createHome, createLocation, createImage });
   } catch (error) {
-    res.status(500).json(error.message);
+    if (global.createHome) {
+      await propertyController.deleteProperty(createHome.id);
+    }
+    if (global.createLocation) {
+      await locationControler.deleteLocation(createLocation.id);
+    }
+    res.status(500).json({
+      status: 500,
+      message: "Falha Ao cadastrar a propriedade.!",
+    });
   }
 });
 
