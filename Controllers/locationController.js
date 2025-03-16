@@ -26,5 +26,19 @@ class locationController {
             }
         });
     }
+    deleteLocation(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return this.prisma.location.delete({
+                    where: {
+                        id: id
+                    }
+                });
+            }
+            catch (error) {
+                return error;
+            }
+        });
+    }
 }
 module.exports = new locationController;

@@ -26,5 +26,19 @@ class imageController {
             }
         });
     }
+    deleteImages(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return this.prisma.images.delete({
+                    where: {
+                        id: id
+                    }
+                });
+            }
+            catch (error) {
+                return error;
+            }
+        });
+    }
 }
 module.exports = new imageController;

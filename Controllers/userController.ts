@@ -1,6 +1,6 @@
 import { PrismaClient, User } from "@prisma/client";
 
-class userController{
+class userController {
     private prisma: PrismaClient;
 
     constructor() {
@@ -12,6 +12,17 @@ class userController{
             return this.prisma.user.create({
                 data: {
                     ...data
+                }
+            })
+        } catch (error) {
+            return error
+        }
+    }
+    async deleteUser(id: string) {
+        try {
+            return this.prisma.user.delete({
+                where: {
+                    id: id
                 }
             })
         } catch (error) {

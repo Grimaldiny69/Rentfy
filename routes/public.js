@@ -19,7 +19,6 @@ router.get("/", async (req, res) => {
     const PassValidation = await bcrypt.compare(password, userData.password);
 
     if (PassValidation) {
-      console.log(secretKey);
       const token = await jwt.sign({ id: userData.id }, secretKey, {
         expiresIn: "1h",
       });
@@ -86,11 +85,15 @@ router.post("/cadastro/propriedades", async (req, res) => {
         propertyId: createHome.id,
       });
 
-      const createImage = await imageController.createImages({
-        ...imageData,
-        propertyId: createHome.id,
-      });
-      res.status(201).send({ createHome, createLocation, createImage });
+      if (createLocation) {
+        const createImage = await imageController.createImages({
+          ...imageData,
+          propertyId: createHome.id,
+        });
+        res.status(201).send({ createHome, createLocation, createImage });
+      } else {
+        await propertyController.deleteProperty({});
+      }
     }
   } catch (error) {
     res.status(500).json(error.message);

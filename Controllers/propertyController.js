@@ -26,5 +26,19 @@ class propertyController {
             }
         });
     }
+    deleteProperty(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return this.prisma.property.delete({
+                    where: {
+                        id: id
+                    }
+                });
+            }
+            catch (error) {
+                return error;
+            }
+        });
+    }
 }
 module.exports = new propertyController;

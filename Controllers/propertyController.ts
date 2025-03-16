@@ -16,5 +16,16 @@ class propertyController {
             return error
         }
     }
+    async deleteProperty(id: string) {
+        try {
+            return this.prisma.property.delete({
+                where: {
+                    id: id
+                }
+            })
+        } catch (error) {
+            return error
+        }
+    }
 }
 module.exports = new propertyController

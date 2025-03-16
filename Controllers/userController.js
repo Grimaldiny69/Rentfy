@@ -26,5 +26,19 @@ class userController {
             }
         });
     }
+    deleteUser(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return this.prisma.user.delete({
+                    where: {
+                        id: id
+                    }
+                });
+            }
+            catch (error) {
+                return error;
+            }
+        });
+    }
 }
 module.exports = new userController;

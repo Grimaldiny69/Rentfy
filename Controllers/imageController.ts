@@ -16,6 +16,17 @@ class imageController {
             return error
         }
     }
+    async deleteImages(id: string) {
+        try {
+            return this.prisma.images.delete({
+                where: {
+                    id: id
+                }
+            })
+        } catch (error) {
+            return error
+        }
+    }
 }
 
 module.exports = new imageController

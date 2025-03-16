@@ -16,5 +16,18 @@ class locationController {
             return error
         }
     }
+    async deleteLocation(id: string) {
+        try {
+            return this.prisma.location.delete({
+                where: {
+                    id: id
+                }
+            })
+        } catch (error) {
+            return error
+
+        }
+
+    }
 }
 module.exports = new locationController
